@@ -1,9 +1,0 @@
-Dataset Name: Madhav Store Dataset
-
-Source:
-https://www.kaggle.com/datasets/saadharoon27/madhav-store-dataset
-
-Description:
-This dataset is used for testing the AI Sales Forecasting & Business Analytics Suite.
-It contains sales data including order date, amount, category, region, and quantity,
-which helps perform forecasting, trend analysis, and regional analytics.
