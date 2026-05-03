@@ -24,7 +24,7 @@ export const InputField = memo(forwardRef<HTMLInputElement, InputFieldProps>(
           </div>
           <input
             ref={ref}
-            className={`block w-full pl-12 ${rightIcon ? 'pr-12' : 'pr-4'} py-3.5 border border-glass-border/50 rounded-xl leading-5 bg-obsidian-light/40 text-slate-200 placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-cyber-purple/60 focus:border-cyber-purple/60 transition-all duration-300 sm:text-sm backdrop-blur-xl shadow-inner disabled:opacity-50 disabled:cursor-not-allowed relative z-0 ${className}`}
+            className={`block w-full pl-12 ${rightIcon ? 'pr-12' : 'pr-4'} py-3.5 border border-black/20 dark:border-glass-border/50 rounded-xl leading-5 bg-black/5 dark:bg-obsidian-light/40 text-slate-200 placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-cyber-purple/60 focus:border-cyber-purple/60 transition-all duration-300 sm:text-sm backdrop-blur-xl shadow-inner disabled:opacity-50 disabled:cursor-not-allowed relative z-0 ${className}`}
             {...props}
           />
           {rightIcon && (

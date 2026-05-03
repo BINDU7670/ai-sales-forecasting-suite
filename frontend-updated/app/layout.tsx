@@ -1,0 +1,33 @@
+import type { Metadata } from 'next';
+import { Inter, Space_Grotesk } from 'next/font/google';
+import { ThemeProvider } from 'next-themes';
+import './globals.css';
+
+const inter = Inter({
+  subsets: ['latin'],
+  variable: '--font-sans',
+});
+
+const spaceGrotesk = Space_Grotesk({
+  subsets: ['latin'],
+  variable: '--font-heading',
+});
+
+export const metadata: Metadata = {
+  title: 'AI Sales Forecasting & Business Analytics Suite',
+  description: 'Forecast the Future with AI. Zero-training LLM advantage for business analytics.',
+};
+
+export default function RootLayout({ children }: { children: React.ReactNode }) {
+  return (
+    <html lang="en" suppressHydrationWarning className={`${inter.variable} ${spaceGrotesk.variable}`}>
+      <head>
+      </head>
+      <body className="antialiased min-h-screen flex flex-col" suppressHydrationWarning>
+        <ThemeProvider attribute="class" defaultTheme="light" enableSystem={false}>
+          {children}
+        </ThemeProvider>
+      </body>
+    </html>
+  );
+}

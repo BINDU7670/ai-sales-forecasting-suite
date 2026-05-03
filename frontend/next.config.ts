@@ -18,14 +18,7 @@ const nextConfig: NextConfig = {
       },
     ],
   },
-  output: 'standalone',
-  webpack: (config, { dev, isServer }) => {
-    if (dev && process.env.DISABLE_HMR === 'true') {
-      config.watchOptions = {
-        ignored: /.*/,
-      };
-    }
-
+  webpack: (config, { isServer }) => {
     if (!isServer) {
       config.resolve.alias = {
         ...config.resolve.alias,

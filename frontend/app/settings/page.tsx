@@ -33,6 +33,8 @@ const ToggleSwitch = ({ checked, onChange, label }: { checked: boolean, onChange
   </div>
 );
 
+import { ThemeToggle } from '@/components/ThemeToggle';
+
 export default function SettingsPage() {
   const router = useRouter();
   const [isDesktopSidebarOpen, setDesktopSidebarOpen] = useState(true);
@@ -317,11 +319,11 @@ export default function SettingsPage() {
         <div className="h-16 flex items-center justify-between px-4 border-b border-glass-border">
           <span className={`font-bold text-lg tracking-tight text-white transition-all duration-300 whitespace-nowrap overflow-hidden ${!isDesktopSidebarOpen ? 'md:max-w-0 md:opacity-0' : 'md:max-w-[150px] md:opacity-100'}`}>Forecast</span>
           
-          <button onClick={() => setMobileSidebarOpen(false)} className="md:hidden p-2 rounded-lg hover:bg-white/5 transition-colors text-slate-400 hover:text-white cursor-pointer">
+          <button onClick={() => setMobileSidebarOpen(false)} className="md:hidden p-2 rounded-lg hover:bg-black/5 dark:hover:bg-white/5 transition-colors text-slate-400 hover:text-white cursor-pointer">
             <ChevronLeft size={20} />
           </button>
 
-          <button onClick={() => setDesktopSidebarOpen(!isDesktopSidebarOpen)} className={`hidden md:block p-2 rounded-lg hover:bg-white/5 transition-colors text-slate-400 hover:text-white cursor-pointer ${!isDesktopSidebarOpen ? 'mx-auto' : ''}`}>
+          <button onClick={() => setDesktopSidebarOpen(!isDesktopSidebarOpen)} className={`hidden md:block p-2 rounded-lg hover:bg-black/5 dark:hover:bg-white/5 transition-colors text-slate-400 hover:text-white cursor-pointer ${!isDesktopSidebarOpen ? 'mx-auto' : ''}`}>
             {isDesktopSidebarOpen ? <ChevronLeft size={20} /> : <Menu size={20} />}
           </button>
         </div>
@@ -377,11 +379,14 @@ export default function SettingsPage() {
           <div className="flex items-center gap-3">
             <button 
               onClick={() => setMobileSidebarOpen(true)} 
-              className="md:hidden p-2 -ml-2 rounded-lg hover:bg-white/5 transition-colors text-slate-400 hover:text-white cursor-pointer"
+              className="md:hidden p-2 -ml-2 rounded-lg hover:bg-black/5 dark:hover:bg-white/5 transition-colors text-slate-400 hover:text-white cursor-pointer"
             >
               <Menu size={20} />
             </button>
             <h1 className="text-xl font-semibold text-white">Settings & Preferences</h1>
+          </div>
+          <div className="flex items-center gap-2">
+            <ThemeToggle />
           </div>
         </header>
 
@@ -396,7 +401,7 @@ export default function SettingsPage() {
                   className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-300 text-sm font-medium cursor-pointer ${
                     activeTab === tab.id
                       ? 'bg-gradient-to-r from-electric-indigo/20 to-transparent text-white border-l-2 border-electric-indigo shadow-[inset_0_0_20px_rgba(99,102,241,0.1)]'
-                      : 'text-slate-400 hover:bg-white/5 hover:text-slate-200 border-l-2 border-transparent'
+                      : 'text-slate-400 hover:bg-black/5 dark:hover:bg-white/5 hover:text-slate-200 border-l-2 border-transparent'
                   }`}
                 >
                   <span className={activeTab === tab.id ? 'text-electric-indigo' : 'text-slate-500'}>
@@ -407,7 +412,7 @@ export default function SettingsPage() {
               ))}
             </div>
 
-            {/* Right Panel: Active Settings Views */}
+            {}
             <div className="flex-1">
               <AnimatePresence mode="wait">
                 <motion.div
@@ -467,7 +472,7 @@ export default function SettingsPage() {
                           onChange={() => {}}
                           disabled
                           icon={<User className="h-5 w-5 text-slate-300" />}
-                          className="!text-slate-100 !opacity-100"
+                          className="!text-slate-800 dark:!text-slate-100 !opacity-100"
                         />
                         <div className="md:col-span-2">
                           <InputField
@@ -491,7 +496,7 @@ export default function SettingsPage() {
                         <button 
                           onClick={handleSaveProfile} 
                           disabled={isSaving || isSaved} 
-                          className={`px-6 py-2.5 rounded-xl text-white font-medium text-sm transition-all shadow-lg cursor-pointer disabled:opacity-70 disabled:cursor-not-allowed ${
+                          className={`px-6 py-2.5 rounded-xl text-pure-white dark:text-white font-medium text-sm transition-all shadow-lg cursor-pointer disabled:opacity-70 disabled:cursor-not-allowed ${
                             isSaved 
                               ? 'bg-emerald-500/80 shadow-emerald-500/20 ring-1 ring-emerald-400' 
                               : 'bg-gradient-ai hover:opacity-90 shadow-[0_0_15px_rgba(99,102,241,0.3)]'
@@ -551,7 +556,7 @@ export default function SettingsPage() {
                             <button 
                               onClick={handleRemoveKey}
                               disabled={isRemovingKey || !apiKey}
-                              className="w-full sm:w-auto px-6 py-3.5 mb-4 rounded-xl bg-rose-500/10 border border-rose-500/30 text-rose-400 font-medium text-sm hover:bg-rose-500/20 transition-all flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
+                              className="w-full sm:w-auto px-6 py-3.5 mb-4 rounded-xl bg-rose-500/10 border border-rose-500/30 text-pure-white dark:text-rose-400 font-medium text-sm hover:bg-rose-500/20 transition-all flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
                             >
                               {isRemovingKey ? <Loader2 className="w-4 h-4 animate-spin" /> : <Trash2 className="w-4 h-4" />}
                               Remove Key
@@ -636,7 +641,7 @@ export default function SettingsPage() {
                               { value: 'gbp', label: 'GBP (£)' }
                             ]}
                             className="w-full"
-                            buttonClassName="py-3.5 bg-obsidian-light/40 border-glass-border/50 backdrop-blur-xl shadow-inner"
+                            buttonClassName="py-3.5 bg-black/5 dark:bg-obsidian-light/40 border-black/20 dark:border-glass-border/50 backdrop-blur-xl shadow-inner"
                           />
                         </div>
 
@@ -652,7 +657,7 @@ export default function SettingsPage() {
                               { value: 'dd-mm-yyyy', label: 'DD/MM/YYYY' }
                             ]}
                             className="w-full"
-                            buttonClassName="py-3.5 bg-obsidian-light/40 border-glass-border/50 backdrop-blur-xl shadow-inner"
+                            buttonClassName="py-3.5 bg-black/5 dark:bg-obsidian-light/40 border-black/20 dark:border-glass-border/50 backdrop-blur-xl shadow-inner"
                           />
                         </div>
                       </div>
@@ -661,7 +666,7 @@ export default function SettingsPage() {
                         <button 
                           onClick={handleSavePreferences} 
                           disabled={isSavingPrefs || isSavedPrefs} 
-                          className={`px-6 py-2.5 rounded-xl text-white font-medium text-sm transition-all shadow-lg cursor-pointer disabled:opacity-70 disabled:cursor-not-allowed ${
+                          className={`px-6 py-2.5 rounded-xl text-pure-white dark:text-white font-medium text-sm transition-all shadow-lg cursor-pointer disabled:opacity-70 disabled:cursor-not-allowed ${
                             isSavedPrefs 
                               ? 'bg-emerald-500/80 shadow-emerald-500/20 ring-1 ring-emerald-400' 
                               : 'bg-gradient-ai hover:opacity-90 shadow-[0_0_15px_rgba(99,102,241,0.3)]'
@@ -708,7 +713,7 @@ export default function SettingsPage() {
                           <button 
                             onClick={handleDeleteAccount}
                             disabled={isDeleting}
-                            className="px-4 py-2 rounded-lg bg-red-600 hover:bg-red-700 text-white text-sm font-medium transition-colors whitespace-nowrap flex items-center justify-center gap-2 shadow-[0_0_15px_rgba(220,38,38,0.3)] cursor-pointer disabled:opacity-50 disabled:cursor-wait"
+                            className="px-4 py-2 rounded-lg bg-red-600 hover:bg-red-700 text-pure-white dark:text-white text-sm font-medium transition-colors whitespace-nowrap flex items-center justify-center gap-2 shadow-[0_0_15px_rgba(220,38,38,0.3)] cursor-pointer disabled:opacity-50 disabled:cursor-wait"
                           >
                             {isDeleting ? <Loader2 className="animate-spin" size={16} /> : <Trash2 size={16} />}
                             {isDeleting ? 'Deleting...' : 'Delete Account'}
