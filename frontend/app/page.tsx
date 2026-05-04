@@ -5,10 +5,11 @@ import { TransitionLink } from '@/components/TransitionLink';
 import { ArrowRight, BarChart3, BrainCircuit, Zap } from 'lucide-react';
 import dynamic from 'next/dynamic';
 import { CustomSelect } from '@/components/CustomSelect';
+import { ThemeToggle } from '@/components/ThemeToggle';
 
 const SalesChart = dynamic(() => import('@/components/SalesChart').then(mod => mod.SalesChart), {
   loading: () => (
-    <div className="h-[250px] w-full mt-4 flex items-center justify-center text-slate-500 bg-obsidian-light/20 rounded-xl border border-glass-border/50 animate-pulse">
+    <div className="h-[250px] w-full mt-4 flex items-center justify-center text-slate-500 bg-black/5 dark:bg-white/5 rounded-xl border border-glass-border/50 animate-pulse">
       Loading chart...
     </div>
   )
@@ -19,25 +20,29 @@ export default function LandingPage() {
 
   return (
     <main className="flex-1 flex flex-col items-center justify-center w-full px-4 sm:px-6 lg:px-8 py-12 lg:py-24 overflow-hidden relative min-h-screen">
-      <div className="absolute top-[-10%] left-[-20%] md:top-[-10%] md:left-[-10%] w-[80vw] md:w-[40vw] aspect-square rounded-full bg-[radial-gradient(circle,rgba(99,102,241,0.2)_0%,transparent_70%)] pointer-events-none" />
-      <div className="absolute bottom-[-10%] right-[-20%] md:bottom-[-10%] md:right-[-10%] w-[80vw] md:w-[40vw] aspect-square rounded-full bg-[radial-gradient(circle,rgba(168,85,247,0.2)_0%,transparent_70%)] pointer-events-none" />
+      <div className="absolute top-4 right-4 z-[100]">
+        <ThemeToggle />
+      </div>
+      {}
+      <div className="absolute top-[-10%] left-[-20%] md:top-[-10%] md:left-[-10%] w-[80vw] md:w-[40vw] max-w-[800px] aspect-square rounded-full bg-[radial-gradient(circle,rgba(99,102,241,0.2)_0%,transparent_70%)] pointer-events-none" />
+      <div className="absolute bottom-[-10%] right-[-20%] md:bottom-[-10%] md:right-[-10%] w-[80vw] md:w-[40vw] max-w-[800px] aspect-square rounded-full bg-[radial-gradient(circle,rgba(168,85,247,0.2)_0%,transparent_70%)] pointer-events-none" />
 
-
+      {}
       <div className="max-w-4xl mx-auto text-center z-10 space-y-8">
-        <h1 className="text-5xl md:text-7xl font-bold tracking-tight">
+        <h1 className="text-5xl md:text-7xl font-bold tracking-tight text-slate-900 dark:text-white">
           Forecast the Future <br className="hidden md:block" />
           <span className="bg-gradient-to-r from-electric-indigo via-cyber-purple to-neon-teal bg-clip-text text-transparent inline-block pb-1">with AI</span>
         </h1>
-        <p className="text-lg md:text-xl text-slate-400 max-w-2xl mx-auto font-light">
+        <p className="text-lg md:text-xl text-slate-500 dark:text-slate-400 max-w-2xl mx-auto font-light">
           Unlock the zero-training LLM advantage. Instantly analyze sales data, generate actionable insights, and predict trends without complex ML pipelines.
         </p>
         <div className="flex justify-center pt-4">
           <TransitionLink 
             href="/auth" 
             loaderText="INITIALIZING..."
-            className="group relative inline-flex items-center justify-center px-8 py-4 font-medium text-white transition-all duration-300 ease-in-out rounded-full bg-obsidian-light border border-glass-border hover:border-cyber-purple/50 hover:shadow-[0_0_20px_rgba(168,85,247,0.4)] overflow-hidden"
+            className="group relative inline-flex items-center justify-center px-8 py-4 font-medium text-[#ffffff] transition-all duration-300 ease-in-out rounded-full bg-slate-900 hover:bg-slate-800 dark:bg-obsidian-light border border-slate-800 dark:border-glass-border dark:hover:border-cyber-purple/50 shadow-lg dark:hover:shadow-[0_0_20px_rgba(168,85,247,0.4)] overflow-hidden"
           >
-            <span className="absolute inset-0 w-full h-full -mt-1 rounded-lg opacity-30 bg-gradient-to-b from-transparent via-transparent to-cyber-purple"></span>
+            <span className="absolute inset-0 w-full h-full -mt-1 rounded-lg opacity-0 dark:opacity-30 bg-gradient-to-b from-transparent via-transparent to-cyber-purple"></span>
             <span className="relative flex items-center gap-2">
               Get Started
               <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
@@ -46,10 +51,11 @@ export default function LandingPage() {
         </div>
       </div>
 
-
+      {}
       <div className="w-full max-w-5xl mx-auto mt-20 z-10 relative">
         <div className="absolute inset-0 bg-gradient-to-b from-electric-indigo/10 to-transparent rounded-2xl blur-xl" />
         <div className="glass-panel-glow rounded-2xl p-6 md:p-8 relative overflow-hidden">
+          {}
           <div className="flex items-center justify-between mb-8 border-b border-glass-border pb-4">
             <div className="flex items-center gap-3">
               <div className="w-3 h-3 rounded-full bg-rose-500" />
@@ -60,7 +66,9 @@ export default function LandingPage() {
           </div>
 
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            {}
             <div className="lg:col-span-1 space-y-6">
+              {}
               <div className="glass-panel rounded-xl p-6 transition-transform hover:scale-[1.02] duration-300">
                 <h3 className="text-sm font-medium text-slate-400 mb-2 uppercase tracking-wider">Projected Revenue</h3>
                 <div className="flex items-end gap-3">
@@ -71,7 +79,7 @@ export default function LandingPage() {
                 </div>
               </div>
 
-
+              {}
               <div className="glass-panel rounded-xl p-6 relative overflow-hidden group">
                 <div className="absolute top-0 left-0 w-1 h-full bg-gradient-ai" />
                 <div className="flex items-center gap-2 mb-3">
@@ -84,7 +92,7 @@ export default function LandingPage() {
               </div>
             </div>
 
-
+            {}
             <div className="lg:col-span-2 glass-panel rounded-xl p-6">
               <div className="flex items-center justify-between mb-2">
                 <h3 className="text-sm font-medium text-slate-400 uppercase tracking-wider">Revenue Trend</h3>
@@ -105,7 +113,7 @@ export default function LandingPage() {
         </div>
       </div>
 
-
+      {}
       <div className="w-full max-w-5xl mx-auto mt-24 z-10 grid grid-cols-1 md:grid-cols-3 gap-6">
         <div className="glass-panel rounded-xl p-8 transition-all hover:-translate-y-1 hover:shadow-[0_10px_30px_rgba(99,102,241,0.1)]">
           <div className="w-12 h-12 rounded-lg bg-electric-indigo/20 flex items-center justify-center mb-6 border border-electric-indigo/30">

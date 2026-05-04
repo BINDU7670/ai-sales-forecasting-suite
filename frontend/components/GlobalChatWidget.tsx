@@ -33,8 +33,17 @@ export function GlobalChatWidget() {
   const [chatHistory, setChatHistory] = useState<{ role: string; content: string }[]>([]);
   const [chatInput, setChatInput] = useState('');
   const [isChatProcessing, setIsChatProcessing] = useState(false);
+  const [forecastContext, setForecastContext] = useState<any>(null);
   const chatInputRef = useRef<HTMLInputElement>(null);
   const chatEndRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const handleContextUpdate = (e: any) => {
+      setForecastContext(e.detail);
+    };
+    window.addEventListener('forecastContextUpdated', handleContextUpdate);
+    return () => window.removeEventListener('forecastContextUpdated', handleContextUpdate);
+  }, []);
 
   useEffect(() => {
     if (isChatOpen && !isChatProcessing) {
@@ -65,7 +74,11 @@ export function GlobalChatWidget() {
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ message: newMessage, history: chatHistory }),
+        body: JSON.stringify({ 
+          message: newMessage, 
+          history: chatHistory,
+          forecast_context: forecastContext 
+        }),
       });
 
       if (!res.ok) throw new Error('Failed');
@@ -91,7 +104,7 @@ export function GlobalChatWidget() {
         <button
           onClick={() => setIsChatOpen(true)}
           title="Open Forecast AI Chat"
-          className="fixed bottom-6 right-6 lg:bottom-8 lg:right-8 p-4 bg-electric-indigo hover:bg-electric-indigo/80 text-white rounded-full shadow-[0_0_20px_rgba(99,102,241,0.5)] transition-all hover:scale-110 z-[200] flex items-center justify-center cursor-pointer"
+          className="fixed bottom-6 right-6 lg:bottom-8 lg:right-8 p-4 bg-black hover:bg-black/90 dark:bg-electric-indigo dark:hover:bg-electric-indigo/80 text-[#ffffff] rounded-full shadow-lg dark:shadow-[0_0_20px_rgba(99,102,241,0.5)] transition-all hover:scale-110 z-[200] flex items-center justify-center cursor-pointer"
         >
           <MessageCircle size={24} />
         </button>

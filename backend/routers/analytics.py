@@ -12,10 +12,27 @@ class ChatMessage(BaseModel):
     role: str
     content: str
 
+class ForecastContext(BaseModel):
+    trend: Optional[str] = None
+    confidence_score: Optional[int] = None
+    projected_total: Optional[str] = None
+    avg_historical: Optional[str] = None
+    growth_rate: Optional[str] = None
+    data_points: Optional[int] = None
+    feature_importance: Optional[list] = None
+    marketing_spend: Optional[int] = 0
+    holiday_boost: Optional[int] = 0
+    use_weather: Optional[bool] = False
+    use_macro: Optional[bool] = False
+    ignore_anomaly: Optional[bool] = False
+    date_range: Optional[str] = None
+    forecast_points: Optional[list] = None
+
 class ChatRequest(BaseModel):
     message: str
     history: List[ChatMessage]
     category: Optional[str] = None
+    forecast_context: Optional[ForecastContext] = None
 
 router = APIRouter(prefix="/analytics", tags=["Analytics"])
 
@@ -92,10 +109,11 @@ def chat_endpoint(
     api_key = settings.groq_api_key if settings else None
         
     ai_response = chat_with_ai(
-        kpis=kpi_result["kpis"], 
-        history=request.history, 
+        kpis=kpi_result["kpis"],
+        history=request.history,
         message=request.message,
-        user_api_key=api_key
+        user_api_key=api_key,
+        forecast_context=request.forecast_context.dict() if request.forecast_context else None
     )
     
     return {"status": "success", "response": ai_response}

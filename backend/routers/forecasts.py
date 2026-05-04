@@ -29,6 +29,11 @@ def run_forecast_endpoint(
     horizon:     int = Query(30,  ge=1,  le=365),
     aggregation: str = Query("Monthly"),
     category:    str = Query(None),
+    marketing_spend: int = Query(0, ge=0, le=100),
+    holiday_boost: int = Query(0, ge=0, le=100),
+    use_weather: bool = Query(False),
+    use_macro: bool = Query(False),
+    ignore_anomaly: bool = Query(False),
     db:          Session = Depends(get_db),
     current_user: models.User = Depends(get_current_user),
 ):
@@ -39,6 +44,11 @@ def run_forecast_endpoint(
         horizon=horizon,
         aggregation=aggregation,
         category_filter=category,
+        marketing_spend=marketing_spend,
+        holiday_boost=holiday_boost,
+        use_weather=use_weather,
+        use_macro=use_macro,
+        ignore_anomaly=ignore_anomaly,
     )
 
     if result.get("status") == "error":
@@ -52,6 +62,11 @@ def forecast_narrative_endpoint(
     horizon:     int = Query(30,  ge=1,  le=365),
     aggregation: str = Query("Monthly"),
     category:    str = Query(None),
+    marketing_spend: int = Query(0, ge=0, le=100),
+    holiday_boost: int = Query(0, ge=0, le=100),
+    use_weather: bool = Query(False),
+    use_macro: bool = Query(False),
+    ignore_anomaly: bool = Query(False),
     db:          Session = Depends(get_db),
     current_user: models.User = Depends(get_current_user),
 ):
@@ -62,6 +77,11 @@ def forecast_narrative_endpoint(
         horizon=horizon,
         aggregation=aggregation,
         category_filter=category,
+        marketing_spend=marketing_spend,
+        holiday_boost=holiday_boost,
+        use_weather=use_weather,
+        use_macro=use_macro,
+        ignore_anomaly=ignore_anomaly,
     )
 
     if result.get("status") == "error":
@@ -75,7 +95,13 @@ def forecast_narrative_endpoint(
         horizon=horizon,
         aggregation=aggregation,
         category=category,
-        user_api_key=api_key
+        user_api_key=api_key,
+        marketing_spend=marketing_spend,
+        holiday_boost=holiday_boost,
+        use_weather=use_weather,
+        use_macro=use_macro,
+        ignore_anomaly=ignore_anomaly,
+        feature_importance=result.get("feature_importance", []),
     )
 
     return {

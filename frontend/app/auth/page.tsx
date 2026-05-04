@@ -8,6 +8,7 @@ import { CyberLoader } from '../components/ui/CyberLoader';
 import { LoginForm } from './components/LoginForm';
 import { RegisterForm } from './components/RegisterForm';
 import { ForgotPasswordForm } from './components/ForgotPasswordForm';
+import { ThemeToggle } from '@/components/ThemeToggle';
 
 export default function AuthPage() {
   const [authMode, setAuthMode] = useState<'login' | 'register' | 'forgot'>('login');
@@ -21,9 +22,9 @@ export default function AuthPage() {
 
   return (
     <div className="min-h-screen w-full flex bg-obsidian overflow-hidden">
-      <div className="hidden lg:flex w-1/2 relative flex-col items-center justify-center p-12 overflow-hidden">
+      <div className="hidden lg:flex w-1/2 relative flex-col items-center justify-center p-12 overflow-hidden bg-[#0A0E17]">
         <div className="absolute inset-0 bg-gradient-ai opacity-20 mix-blend-screen" />
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-obsidian/40 via-obsidian to-obsidian" />
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-[#0A0E17]/40 via-[#0A0E17] to-[#0A0E17]" />
         
         <motion.div 
           animate={{ 
@@ -32,7 +33,7 @@ export default function AuthPage() {
             opacity: [0.3, 0.6, 0.3]
           }}
           transition={{ duration: 10, repeat: Infinity, ease: "easeInOut" }}
-          className="absolute top-1/4 left-1/4 w-96 h-96 bg-electric-indigo/30 rounded-full blur-[100px]"
+          className="absolute top-1/4 left-1/4 w-96 h-96 bg-[#6366F1]/30 rounded-full blur-[100px]"
         />
         <motion.div 
           animate={{ 
@@ -41,30 +42,33 @@ export default function AuthPage() {
             opacity: [0.2, 0.5, 0.2]
           }}
           transition={{ duration: 15, repeat: Infinity, ease: "easeInOut", delay: 2 }}
-          className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-cyber-purple/30 rounded-full blur-[100px]"
+          className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-[#A855F7]/30 rounded-full blur-[100px]"
         />
 
         <div className="relative z-10 text-center space-y-6 max-w-lg">
-          <div className="inline-flex items-center justify-center w-20 h-20 rounded-2xl glass-panel-glow mb-8">
-            <BrainCircuit className="w-10 h-10 text-neon-teal" />
+          <div className="inline-flex items-center justify-center w-20 h-20 rounded-2xl bg-[#131A2A]/60 backdrop-blur-xl border border-white/10 shadow-[0_0_30px_rgba(168,85,247,0.2)] mb-8">
+            <BrainCircuit className="w-10 h-10 text-[#2DD4BF]" />
           </div>
-          <h2 className="text-4xl font-bold text-white tracking-tight">
+          <h2 className="text-4xl font-bold text-[#ffffff] tracking-tight">
             The Future of <br/>
-            <span className="bg-gradient-to-r from-electric-indigo via-cyber-purple to-neon-teal bg-clip-text text-transparent inline-block pb-1">Business Intelligence</span>
+            <span className="bg-gradient-to-r from-[#6366F1] via-[#A855F7] to-[#2DD4BF] bg-clip-text text-transparent inline-block pb-1">Business Intelligence</span>
           </h2>
-          <p className="text-slate-400 text-lg font-light leading-relaxed">
+          <p className="text-[#94a3b8] text-lg font-light leading-relaxed">
             Join the platform that transforms raw data into strategic foresight using zero-training LLM technology.
           </p>
         </div>
       </div>
 
       <div className="w-full lg:w-1/2 flex flex-col justify-center px-8 sm:px-16 md:px-24 lg:px-32 relative z-10">
-        <TransitionLink href="/" loaderText="RETURNING HOME..." className="absolute top-8 left-8 sm:left-16 lg:left-32 flex items-center gap-2 text-sm text-slate-400 hover:text-white transition-colors cursor-pointer">
+        <TransitionLink href="/" loaderText="RETURNING HOME..." className="absolute top-8 left-8 sm:left-16 lg:left-32 flex items-center gap-2 text-sm text-slate-400 hover:text-slate-800 dark:hover:text-white transition-colors cursor-pointer">
           <ArrowLeft className="w-4 h-4" />
           Back to Home
         </TransitionLink>
+        <div className="absolute top-8 right-8 sm:right-16 lg:right-32 flex items-center">
+          <ThemeToggle />
+        </div>
 
-        <div className="w-full max-w-md mx-auto">
+        <div className="w-full max-w-md mx-auto mt-20 lg:mt-0">
           <AnimatePresence mode="wait">
             <motion.div
               key={authMode}

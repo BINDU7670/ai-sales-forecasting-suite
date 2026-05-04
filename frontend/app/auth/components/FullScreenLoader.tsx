@@ -14,6 +14,7 @@ export function FullScreenLoader({ isLoading, text }: FullScreenLoaderProps) {
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
+    
     setMounted(true);
     return () => setMounted(false);
   }, []);
