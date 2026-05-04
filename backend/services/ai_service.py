@@ -27,30 +27,30 @@ def get_ai_insight(kpis: dict, user_api_key: str = None) -> dict:
     - Average Order Value: {kpis.get('average_order_value')}
     
     You MUST return ONLY a valid JSON object with this exact structure:
-    {{
+    { 
         "summary": "A concise 2-3 sentence high-level executive overview of business performance written as a business narrative.",
         "recommendation": "A single actionable recommendation starting with 'Recommended: '",
         "insights": [
-            {{
+            { 
                 "title": "Short insight title",
                 "description": "Detailed 1-2 sentence insight description based on the data.",
                 "impact": "High",
                 "type": "opportunity"
-            }},
-            {{
+            } ,
+            { 
                 "title": "Short insight title",
                 "description": "Detailed 1-2 sentence insight description based on the data.",
                 "impact": "Medium",
                 "type": "anomaly"
-            }},
-            {{
+            } ,
+            { 
                 "title": "Short insight title",
                 "description": "Detailed 1-2 sentence insight description based on the data.",
                 "impact": "Critical",
                 "type": "risk"
-            }}
+            } 
         ]
-    }}
+    } 
 
     Rules:
     - 'type' MUST be one of: 'opportunity', 'anomaly', 'risk'
@@ -97,7 +97,8 @@ def get_ai_insight(kpis: dict, user_api_key: str = None) -> dict:
             ]
         }
 
-def chat_with_ai(kpis: dict, history: list, message: str, user_api_key: str = None) -> str:
+def chat_with_ai(kpis: dict, history: list, message: str, user_api_key: str = None,
+                 forecast_context: dict = None) -> str:
     if not user_api_key:
         return "I am currently disconnected. Please configure your personal Groq API Key in your Profile Settings."
 
@@ -106,21 +107,60 @@ def chat_with_ai(kpis: dict, history: list, message: str, user_api_key: str = No
         api_key=user_api_key
     )
 
-    system_prompt = f"""
-    Act as a high-level business data analyst and strategic AI assistant.
-    You are integrated directly into a dynamic executive dashboard for a retail company.
     
-    Current Dashboard Performance Context (KPIs):
-    - Total Revenue: {kpis.get('total_revenue', 'N/A')}
-    - Growth Rate: {kpis.get('growth_rate', 'N/A')}
-    - Average Order Value: {kpis.get('average_order_value', 'N/A')}
-    - Peak Sales Day: {kpis.get('peak_sales_day', 'N/A')}
-    - Sales Variance: {kpis.get('sales_variance', 'N/A')}
-    
-    Answer the user's strategic questions directly using this provided data.
-    Be concise, professional, and directly state actionable insights without overly verbose filler.
-    Use Markdown for formatting if helpful (e.g., bolding important metrics).
-    """
+    forecast_section = ""
+    if forecast_context:
+        fi = forecast_context.get("feature_importance") or []
+        fi_text = ", ".join([f"{f['name']} ({f['value']:.0f}%)" for f in fi[:5]]) if fi else "Not available"
+
+        active_inputs = []
+        if forecast_context.get("marketing_spend", 0) > 0:
+            active_inputs.append(f"Marketing Spend +{forecast_context['marketing_spend']}%")
+        if forecast_context.get("holiday_boost", 0) > 0:
+            active_inputs.append(f"Holiday Boost +{forecast_context['holiday_boost']}%")
+        if forecast_context.get("use_weather"):
+            active_inputs.append("Weather data (Open-Meteo)")
+        if forecast_context.get("use_macro"):
+            active_inputs.append("Macroeconomic data (FRED Unemployment Rate)")
+        if forecast_context.get("ignore_anomaly"):
+            active_inputs.append("Viral Spike Filter (95th percentile clipping)")
+        inputs_text = ", ".join(active_inputs) if active_inputs else "None"
+
+        points = forecast_context.get("forecast_points") or []
+        points_text = "Not available"
+        if points:
+            
+            formatted_points = [f"{p['date']}: ${p['value']/1000:.1f}k (Inv: {p['inventory']/1000:.1f}k)" for p in points[:12]]
+            points_text = ", ".join(formatted_points)
+            if len(points) > 12:
+                points_text += f" ... (+{len(points)-12} more periods)"
+
+        forecast_section = f"""
+Latest AI Forecast Results (XGBoost + Holt-Winters Model):
+- Trend direction: {forecast_context.get('trend', 'N/A')}
+- Historical growth rate: {forecast_context.get('growth_rate', 'N/A')}
+- AI Confidence score: {forecast_context.get('confidence_score', 'N/A')}%
+- Average historical period revenue: {forecast_context.get('avg_historical', 'N/A')}
+- Projected total (forecast horizon): {forecast_context.get('projected_total', 'N/A')}
+- Data points used to train model: {forecast_context.get('data_points', 'N/A')}
+- Dataset date range: {forecast_context.get('date_range', 'N/A')}
+- Active model inputs applied: {inputs_text}
+- Top XGBoost feature drivers: {fi_text}
+- Projected Points Timeline: {points_text}
+"""
+
+    system_prompt = f"""You are a high-level business data analyst and strategic AI assistant integrated into an executive sales forecasting dashboard.
+
+Current Dashboard KPIs (from user's uploaded dataset):
+- Total Revenue: {kpis.get('total_revenue', 'N/A')}
+- Growth Rate: {kpis.get('growth_rate', 'N/A')}
+- Average Order Value: {kpis.get('average_order_value', 'N/A')}
+- Peak Sales Day: {kpis.get('peak_sales_day', 'N/A')}
+- Sales Variance: {kpis.get('sales_variance', 'N/A')}
+{forecast_section}
+You have full awareness of all KPIs, the AI forecast model results, XGBoost feature drivers, and any active data inputs (weather, macro, sliders).
+Answer the user's strategic questions using this data. Be concise, professional, and directly state actionable insights.
+Use Markdown for formatting if helpful (e.g., bolding important metrics). Never say you don't have data if it's listed above."""
 
     messages = [{"role": "system", "content": system_prompt}]
     
@@ -146,7 +186,11 @@ def chat_with_ai(kpis: dict, history: list, message: str, user_api_key: str = No
 
 
 def get_forecast_narrative(summary_stats: dict, horizon: int, aggregation: str,
-                           category: str = None, user_api_key: str = None) -> str:
+                           category: str = None, user_api_key: str = None,
+                           marketing_spend: int = 0, holiday_boost: int = 0,
+                           use_weather: bool = False, use_macro: bool = False,
+                           ignore_anomaly: bool = False,
+                           feature_importance: list = None) -> str:
     """Generate a natural-language forecast explanation using AI."""
     if not user_api_key:
         trend = summary_stats.get("trend", "stable")
@@ -160,11 +204,31 @@ def get_forecast_narrative(summary_stats: dict, horizon: int, aggregation: str,
     client = OpenAI(base_url="https://api.groq.com/openai/v1", api_key=user_api_key)
     cat_note = f" for the '{category}' category" if category else ""
 
-    prompt = f"""You are an expert business analyst embedded in an AI forecasting dashboard.
-Analyze the following forecast summary statistics{cat_note} and write a professional,
-concise 2-3 sentence explanation of the {horizon}-period {aggregation} forecast.
+    
+    active_inputs = []
+    if marketing_spend > 0:
+        active_inputs.append(f"Marketing Spend boost of +{marketing_spend}%")
+    if holiday_boost > 0:
+        active_inputs.append(f"Holiday Season Effect of +{holiday_boost}%")
+    if use_weather:
+        active_inputs.append("real-time Weather data (Open-Meteo temperature feed)")
+    if use_macro:
+        active_inputs.append("Macroeconomic data (FRED US Unemployment Rate)")
+    if ignore_anomaly:
+        active_inputs.append("Viral Spike filter (95th percentile anomaly removal)")
+    inputs_note = ("Active AI inputs: " + ", ".join(active_inputs) + ".") if active_inputs else "No external inputs or sliders were applied."
 
-Stats:
+    
+    fi_note = ""
+    if feature_importance:
+        top_features = feature_importance[:3]
+        fi_note = "Top XGBoost feature drivers: " + ", ".join([f"{f['name']} ({f['value']:.0f}%)" for f in top_features]) + "."
+
+    prompt = f"""You are an expert business analyst embedded in an AI forecasting dashboard.
+Analyze the following forecast summary{cat_note} and write a professional, concise 3-4 sentence
+explanation of the {horizon}-period {aggregation} forecast that references the active AI inputs.
+
+Forecast Stats:
 - Trend direction: {summary_stats.get('trend')}
 - Growth rate (historical): {summary_stats.get('growth_rate')}
 - Confidence score: {summary_stats.get('confidence_score')}%
@@ -172,9 +236,14 @@ Stats:
 - Projected total over forecast horizon: {summary_stats.get('projected_total')}
 - Historical data points used: {summary_stats.get('data_points')}
 
+Model Inputs:
+- {inputs_note}
+- {fi_note if fi_note else 'Feature importance not available.'}
+
 Instructions:
-- Mention the trend direction and what is driving it.
-- Reference the projected total and confidence level.
+- Mention the trend direction and projected total clearly.
+- Briefly reference 1-2 of the active model inputs if any, explaining how they shaped the forecast.
+- Mention the top driving feature from XGBoost if available.
 - End with one concrete strategic recommendation.
 - Write in a direct, professional tone. No bullet points. Plain prose only."""
 
@@ -182,7 +251,7 @@ Instructions:
         response = client.chat.completions.create(
             model="llama-3.3-70b-versatile",
             messages=[{"role": "user", "content": prompt}],
-            max_tokens=300,
+            max_tokens=350,
         )
         return response.choices[0].message.content.strip()
 
@@ -195,6 +264,7 @@ Instructions:
             f"Based on the historical analysis, sales show a {trend} trend{cat_note}. "
             f"The model projects {projected} in total revenue over the next {horizon} "
             f"{aggregation.lower()} periods with a {confidence}% confidence score. "
+            f"{inputs_note} "
             f"Align inventory and promotional spend with the projected demand curve "
             f"to maximize capture of the upcoming growth window."
         )

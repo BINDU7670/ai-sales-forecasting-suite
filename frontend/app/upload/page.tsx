@@ -11,6 +11,8 @@ import {
 import { motion, AnimatePresence } from 'motion/react';
 import { NavItem } from '@/components/NavItem';
 
+import { ThemeToggle } from '@/components/ThemeToggle';
+
 interface Dataset {
   id: number;
   original_filename: string;
@@ -49,7 +51,7 @@ export default function UploadPage() {
         headers: { 'Authorization': `Bearer ${token}` }
       });
       if (res.ok) setDatasets(await res.json());
-    } catch { /* silent */ }
+    } catch {  }
     finally { setIsDatasetsLoading(false); }
   }, [router]);
 
@@ -130,10 +132,10 @@ export default function UploadPage() {
       <aside className={`fixed md:relative z-50 md:z-20 flex flex-col h-screen transition-[width,transform] duration-300 ease-in-out border-r border-glass-border bg-obsidian-light shrink-0 ${isDesktopSidebarOpen ? 'w-64' : 'w-64 md:w-20'} ${isMobileSidebarOpen ? 'translate-x-0' : '-translate-x-full'} md:translate-x-0`}>
         <div className="h-16 flex items-center justify-between px-4 border-b border-glass-border">
           <span className={`font-bold text-lg tracking-tight text-white transition-all duration-300 whitespace-nowrap overflow-hidden ${!isDesktopSidebarOpen ? 'md:max-w-0 md:opacity-0' : 'md:max-w-[150px] md:opacity-100'}`}>Forecast</span>
-          <button onClick={() => setMobileSidebarOpen(false)} className="md:hidden p-2 rounded-lg hover:bg-white/5 transition-colors text-slate-400 hover:text-white cursor-pointer">
+          <button onClick={() => setMobileSidebarOpen(false)} className="md:hidden p-2 rounded-lg hover:bg-black/5 dark:hover:bg-white/5 transition-colors text-slate-400 hover:text-white cursor-pointer">
             <ChevronLeft size={20} />
           </button>
-          <button onClick={() => setDesktopSidebarOpen(!isDesktopSidebarOpen)} className={`hidden md:block p-2 rounded-lg hover:bg-white/5 transition-colors text-slate-400 hover:text-white cursor-pointer ${!isDesktopSidebarOpen ? 'mx-auto' : ''}`}>
+          <button onClick={() => setDesktopSidebarOpen(!isDesktopSidebarOpen)} className={`hidden md:block p-2 rounded-lg hover:bg-black/5 dark:hover:bg-white/5 transition-colors text-slate-400 hover:text-white cursor-pointer ${!isDesktopSidebarOpen ? 'mx-auto' : ''}`}>
             {isDesktopSidebarOpen ? <ChevronLeft size={20} /> : <Menu size={20} />}
           </button>
         </div>
@@ -152,15 +154,18 @@ export default function UploadPage() {
 
         <header className="h-16 flex items-center justify-between px-4 sm:px-6 border-b border-glass-border glass-panel z-10 shrink-0">
           <div className="flex items-center gap-3">
-            <button onClick={() => setMobileSidebarOpen(true)} className="md:hidden p-2 -ml-2 rounded-lg hover:bg-white/5 transition-colors text-slate-400 hover:text-white cursor-pointer">
+            <button onClick={() => setMobileSidebarOpen(true)} className="md:hidden p-2 -ml-2 rounded-lg hover:bg-black/5 dark:hover:bg-white/5 transition-colors text-slate-400 hover:text-white cursor-pointer">
               <Menu size={20} />
             </button>
             <h1 className="text-xl font-semibold text-white">Universal Data Concierge</h1>
           </div>
-          <button onClick={fetchDatasets} className="flex items-center gap-2 text-xs text-slate-400 hover:text-white glass-panel px-3 py-1.5 rounded-lg transition-colors cursor-pointer border border-glass-border">
-            <RefreshCw size={13} />
-            <span className="hidden sm:inline">Refresh</span>
-          </button>
+          <div className="flex items-center gap-3">
+            <ThemeToggle />
+            <button onClick={fetchDatasets} className="flex items-center gap-2 text-xs text-slate-400 hover:text-white glass-panel px-3 py-1.5 rounded-lg transition-colors cursor-pointer border border-glass-border">
+              <RefreshCw size={13} />
+              <span className="hidden sm:inline">Refresh</span>
+            </button>
+          </div>
         </header>
 
         <div className="flex-1 overflow-y-auto p-4 sm:p-6 lg:p-8 z-10">
@@ -188,7 +193,7 @@ export default function UploadPage() {
                     <p className="text-xs font-semibold uppercase tracking-wider text-neon-teal/70 mb-0.5">Active Dataset</p>
                     <p className="text-sm font-medium text-white truncate">{activeDataset.original_filename}</p>
                   </div>
-                  <TransitionLink href="/dashboard" className="hidden sm:flex items-center gap-1.5 text-xs font-semibold bg-neon-teal/10 hover:bg-neon-teal/20 border border-neon-teal/30 px-3 py-1.5 rounded-lg transition-colors shrink-0">
+                  <TransitionLink href="/dashboard" className="hidden sm:flex items-center gap-1.5 text-xs font-semibold bg-black hover:bg-black/90 text-pure-white border border-black dark:bg-neon-teal/10 dark:hover:bg-neon-teal/20 dark:border-neon-teal/30 dark:text-neon-teal px-3 py-1.5 rounded-lg transition-colors shrink-0">
                     Go to Dashboard <ArrowRight size={12} />
                   </TransitionLink>
                 </motion.div>
@@ -246,7 +251,7 @@ export default function UploadPage() {
                       </div>
                       <button
                         onClick={startUpload}
-                        className="w-full mt-6 py-4 rounded-xl font-bold text-white bg-gradient-ai hover:shadow-[0_0_20px_rgba(99,102,241,0.4)] transition-all flex items-center justify-center gap-2 group cursor-pointer"
+                        className="w-full mt-6 py-4 rounded-xl font-bold text-pure-white bg-gradient-ai hover:shadow-[0_0_20px_rgba(99,102,241,0.4)] transition-all flex items-center justify-center gap-2 group cursor-pointer"
                       >
                         {selectedFiles.length > 1 ? 'Merge & Analyze' : 'Analyze Dataset'}
                         <ArrowRight size={18} className="transition-transform group-hover:translate-x-1" />
@@ -276,12 +281,12 @@ export default function UploadPage() {
                   <h2 className="text-3xl font-bold text-white mb-4">Data Unified Successfully</h2>
                   <p className="text-slate-400 mb-10">Your dataset is ready for AI analysis and forecasting.</p>
                   <div className="flex flex-col sm:flex-row items-center gap-4">
-                    <TransitionLink href="/dashboard" className="px-10 py-4 font-bold text-white rounded-2xl bg-gradient-ai hover:opacity-90 shadow-[0_10px_30px_rgba(99,102,241,0.3)] transition-all">
+                    <TransitionLink href="/dashboard" className="px-10 py-4 font-bold text-pure-white rounded-2xl bg-gradient-ai hover:opacity-90 shadow-[0_10px_30px_rgba(99,102,241,0.3)] transition-all">
                       Open Dashboard →
                     </TransitionLink>
                     <button
                       onClick={() => { setStatus('idle'); setSelectedFiles([]); }}
-                      className="px-8 py-4 font-medium text-slate-300 rounded-2xl border border-glass-border hover:bg-white/5 transition-all cursor-pointer"
+                      className="px-8 py-4 font-medium text-slate-300 rounded-2xl border border-glass-border hover:bg-black/5 dark:hover:bg-white/5 transition-all cursor-pointer"
                     >
                       Upload Another
                     </button>
@@ -304,7 +309,7 @@ export default function UploadPage() {
               {isDatasetsLoading ? (
                 <div className="p-6 space-y-3">
                   {[1, 2].map(i => (
-                    <div key={i} className="h-16 rounded-xl bg-white/5 animate-pulse" />
+                    <div key={i} className="h-16 rounded-xl bg-black/5 dark:bg-white/5 animate-pulse" />
                   ))}
                 </div>
               ) : datasets.length === 0 ? (
@@ -325,7 +330,7 @@ export default function UploadPage() {
                       transition={{ duration: 0.25, ease: 'easeInOut' }}
                       className="overflow-hidden"
                     >
-                      <div className="flex items-center gap-4 p-4 hover:bg-white/[0.03] transition-colors group border-b border-glass-border/30 last:border-b-0">
+                      <div className="flex items-center gap-4 p-4 hover:bg-black/5 dark:hover:bg-white/[0.03] transition-colors group border-b border-glass-border/30 last:border-b-0">
                         <div className={`p-2 rounded-xl shrink-0 ${index === 0 ? 'bg-neon-teal/10' : 'bg-slate-800/50'}`}>
                           <FileSpreadsheet className={`w-8 h-8 ${index === 0 ? 'text-neon-teal' : 'text-slate-500'}`} />
                         </div>
@@ -356,13 +361,13 @@ export default function UploadPage() {
                               <span className="text-xs text-slate-400">Are you sure?</span>
                               <button
                                 onClick={() => handleDelete(dataset.id)}
-                                className="text-xs font-semibold text-white bg-rose-600 hover:bg-rose-500 px-3 py-1.5 rounded-lg transition-colors cursor-pointer"
+                                className="text-xs font-semibold text-pure-white dark:text-white bg-rose-600 hover:bg-rose-500 px-3 py-1.5 rounded-lg transition-colors cursor-pointer"
                               >
                                 Yes, Delete
                               </button>
                               <button
                                 onClick={() => setConfirmDeleteId(null)}
-                                className="text-xs text-slate-400 hover:text-white px-2 py-1.5 rounded-lg hover:bg-white/5 transition-colors cursor-pointer"
+                                className="text-xs text-slate-400 hover:text-white px-2 py-1.5 rounded-lg hover:bg-black/5 dark:hover:bg-white/5 transition-colors cursor-pointer"
                               >
                                 Cancel
                               </button>

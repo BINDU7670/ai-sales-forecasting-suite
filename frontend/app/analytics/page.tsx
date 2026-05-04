@@ -6,6 +6,12 @@ import { TransitionLink } from '@/components/TransitionLink';
 import { NavItem } from '@/components/NavItem';
 import { CustomSelect } from '@/components/CustomSelect';
 import { CyberLoader } from '../components/ui/CyberLoader';
+import { ThemeToggle } from '@/components/ThemeToggle';
+import dynamic from 'next/dynamic';
+
+const AnomalyDetectionChart = dynamic(() => import('@/components/AnomalyDetectionChart').then(mod => mod.AnomalyDetectionChart), { ssr: false });
+const TopProductsChart = dynamic(() => import('@/components/TopProductsChart').then(mod => mod.TopProductsChart), { ssr: false });
+
 import {
   LayoutDashboard, UploadCloud, LineChart as LineChartIcon, Settings,
   Calendar, Filter, Download, ArrowUpRight, Sparkles, AlertTriangle,
@@ -152,6 +158,7 @@ export default function AnalyticsPage() {
   const [kpis, setKpis] = useState<KpiData>(DEFAULT_KPIS);
   const [aiAnalysis, setAiAnalysis] = useState<AiAnalysis>(DEFAULT_AI);
   const [topProducts, setTopProducts] = useState<TopProduct[]>([]);
+  const [anomalyData, setAnomalyData] = useState<any[]>([]);
   const [dataDateRange, setDataDateRange] = useState<string>('N/A');
 
   const [isKpiLoading, setIsKpiLoading] = useState(true);
@@ -205,6 +212,7 @@ export default function AnalyticsPage() {
       const kpiData = await kpiRes.json();
       setKpis(kpiData.kpis);
       setTopProducts(kpiData.top_products ?? []);
+      setAnomalyData(kpiData.anomaly_data ?? []);
       if (kpiData.categories?.length) setCategories(kpiData.categories);
       if (kpiData.date_range) setDataDateRange(kpiData.date_range);
       setIsKpiLoading(false);
@@ -262,11 +270,11 @@ export default function AnalyticsPage() {
         <div className="h-16 flex items-center justify-between px-4 border-b border-glass-border">
           <span className={`font-bold text-lg tracking-tight text-white transition-all duration-300 whitespace-nowrap overflow-hidden ${!isDesktopSidebarOpen ? 'md:max-w-0 md:opacity-0' : 'md:max-w-[150px] md:opacity-100'}`}>Forecast</span>
 
-          <button onClick={() => setMobileSidebarOpen(false)} className="md:hidden p-2 rounded-lg hover:bg-white/5 transition-colors text-slate-400 hover:text-white cursor-pointer">
+          <button onClick={() => setMobileSidebarOpen(false)} className="md:hidden p-2 rounded-lg hover:bg-black/5 dark:hover:bg-white/5 transition-colors text-slate-400 hover:text-white cursor-pointer">
             <ChevronLeft size={20} />
           </button>
 
-          <button onClick={() => setDesktopSidebarOpen(!isDesktopSidebarOpen)} className={`hidden md:block p-2 rounded-lg hover:bg-white/5 transition-colors text-slate-400 hover:text-white cursor-pointer ${!isDesktopSidebarOpen ? 'mx-auto' : ''}`}>
+          <button onClick={() => setDesktopSidebarOpen(!isDesktopSidebarOpen)} className={`hidden md:block p-2 rounded-lg hover:bg-black/5 dark:hover:bg-white/5 transition-colors text-slate-400 hover:text-white cursor-pointer ${!isDesktopSidebarOpen ? 'mx-auto' : ''}`}>
             {isDesktopSidebarOpen ? <ChevronLeft size={20} /> : <Menu size={20} />}
           </button>
         </div>
@@ -310,7 +318,7 @@ export default function AnalyticsPage() {
           <div className="flex items-center gap-3">
             <button
               onClick={() => setMobileSidebarOpen(true)}
-              className="md:hidden p-2 -ml-2 rounded-lg hover:bg-white/5 transition-colors text-slate-400 hover:text-white cursor-pointer"
+              className="md:hidden p-2 -ml-2 rounded-lg hover:bg-black/5 dark:hover:bg-white/5 transition-colors text-slate-400 hover:text-white cursor-pointer"
             >
               <Menu size={20} />
             </button>
@@ -318,6 +326,7 @@ export default function AnalyticsPage() {
           </div>
 
           <div className="flex items-center gap-2 sm:gap-4">
+            <ThemeToggle />
             <div className="hidden md:flex items-center gap-2 glass-panel px-1 py-1 rounded-lg text-sm text-slate-300">
               <CustomSelect
                 value={dateRange}
@@ -330,7 +339,7 @@ export default function AnalyticsPage() {
                 ]}
                 icon={<Calendar size={16} className="text-electric-indigo" />}
                 className="w-44"
-                buttonClassName="border-none bg-transparent py-1.5 px-3 hover:bg-white/5"
+                buttonClassName="border-none bg-transparent py-1.5 px-3 hover:bg-black/5 dark:hover:bg-white/5"
               />
             </div>
             <div className="hidden lg:flex items-center gap-2 glass-panel px-1 py-1 rounded-lg text-sm text-slate-300">
@@ -340,10 +349,10 @@ export default function AnalyticsPage() {
                 options={categoryOptions.length > 1 ? categoryOptions : [{ value: 'all', label: 'All Categories' }]}
                 icon={<Filter size={16} className="text-cyber-purple" />}
                 className="w-44"
-                buttonClassName="border-none bg-transparent py-1.5 px-3 hover:bg-white/5"
+                buttonClassName="border-none bg-transparent py-1.5 px-3 hover:bg-black/5 dark:hover:bg-white/5"
               />
             </div>
-            <button className="flex items-center gap-2 bg-white/5 hover:bg-white/10 border border-glass-border px-3 sm:px-4 py-1.5 rounded-lg text-sm font-medium transition-colors cursor-pointer">
+            <button className="flex items-center gap-2 bg-black/5 dark:bg-white/5 hover:bg-black/10 dark:hover:bg-white/10 border border-glass-border px-3 sm:px-4 py-1.5 rounded-lg text-sm font-medium transition-colors cursor-pointer">
               <Download size={16} />
               <span className="hidden sm:inline">Export PDF Report</span>
             </button>
@@ -371,7 +380,7 @@ export default function AnalyticsPage() {
                   </TransitionLink>
                 </motion.div>
               )}
-              {/* KPI Grid */}
+              {}
               <motion.div
                 initial={{ opacity: 0, y: 16 }}
                 animate={{ opacity: 1, y: 0 }}
@@ -442,9 +451,9 @@ export default function AnalyticsPage() {
 
                 {isAiLoading ? (
                   <div className="relative z-10 space-y-3 animate-pulse">
-                    <div className="h-4 bg-white/5 rounded-full w-full" />
-                    <div className="h-4 bg-white/5 rounded-full w-4/5" />
-                    <div className="h-4 bg-white/5 rounded-full w-3/5" />
+                    <div className="h-4 bg-black/10 dark:bg-white/5 rounded-full w-full" />
+                    <div className="h-4 bg-black/10 dark:bg-white/5 rounded-full w-4/5" />
+                    <div className="h-4 bg-black/10 dark:bg-white/5 rounded-full w-3/5" />
                   </div>
                 ) : noDataset ? (
                   <div className="relative z-10 text-center py-4">
@@ -477,10 +486,10 @@ export default function AnalyticsPage() {
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                     {[0, 1, 2].map(i => (
                       <div key={i} className="glass-panel rounded-xl p-6 border border-glass-border/30 animate-pulse space-y-4">
-                        <div className="h-10 w-10 bg-white/5 rounded-lg" />
-                        <div className="h-5 bg-white/5 rounded w-3/4" />
-                        <div className="h-3 bg-white/5 rounded w-full" />
-                        <div className="h-3 bg-white/5 rounded w-2/3" />
+                        <div className="h-10 w-10 bg-black/10 dark:bg-white/5 rounded-lg" />
+                        <div className="h-5 bg-black/10 dark:bg-white/5 rounded w-3/4" />
+                        <div className="h-3 bg-black/10 dark:bg-white/5 rounded w-full" />
+                        <div className="h-3 bg-black/10 dark:bg-white/5 rounded w-2/3" />
                       </div>
                     ))}
                   </div>
@@ -546,12 +555,12 @@ export default function AnalyticsPage() {
                         </tr>
                       ) : (
                         topProducts.map((product, i) => (
-                          <tr key={i} className="hover:bg-white/5 transition-colors group">
+                          <tr key={i} className="hover:bg-black/5 dark:hover:bg-white/5 transition-colors group">
                             <td className="px-6 py-4 whitespace-nowrap">
                               <div className="font-medium text-white group-hover:text-neon-teal transition-colors">{product.name}</div>
                             </td>
                             <td className="px-6 py-4 whitespace-nowrap">
-                              <span className="px-2.5 py-1 rounded-full bg-slate-800 text-slate-300 text-xs border border-slate-700">{product.category}</span>
+                              <span className="px-2.5 py-1 rounded-full bg-black dark:bg-slate-800 text-pure-white dark:text-slate-300 text-xs border border-black dark:border-slate-700">{product.category}</span>
                             </td>
                             <td className="px-6 py-4 whitespace-nowrap text-right font-mono text-slate-300">{product.units.toLocaleString()}</td>
                             <td className="px-6 py-4 whitespace-nowrap text-right font-mono text-emerald-400 font-medium">{product.revenue}</td>
@@ -568,6 +577,28 @@ export default function AnalyticsPage() {
                   </table>
                 </div>
               </motion.div>
+
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-8">
+                <div className="glass-panel rounded-2xl p-6 flex flex-col">
+                  <div className="mb-6">
+                    <h3 className="text-lg font-semibold text-white">Anomaly Detection</h3>
+                    <p className="text-sm text-slate-400">Historical sales with AI-flagged anomalies</p>
+                  </div>
+                  <div className="flex-1 min-h-[300px]">
+                    <AnomalyDetectionChart data={anomalyData} />
+                  </div>
+                </div>
+
+                <div className="glass-panel rounded-2xl p-6 flex flex-col">
+                  <div className="mb-6">
+                    <h3 className="text-lg font-semibold text-white">Top Products Chart</h3>
+                    <p className="text-sm text-slate-400">Best-selling items by revenue</p>
+                  </div>
+                  <div className="flex-1 min-h-[300px]">
+                    <TopProductsChart data={topProducts} />
+                  </div>
+                </div>
+              </div>
 
             </div>
           )}

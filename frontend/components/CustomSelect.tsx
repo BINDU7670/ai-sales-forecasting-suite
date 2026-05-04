@@ -97,8 +97,8 @@ export function CustomSelect({
                     setIsOpen(false);
                   }}
                   className={cn(
-                    "w-full text-left px-4 py-2 text-sm transition-colors hover:bg-white/5",
-                    value === option.value ? "text-neon-teal bg-white/5" : "text-slate-300"
+                    "w-full text-left px-4 py-2 text-sm transition-colors hover:bg-black/5 dark:hover:bg-white/5",
+                    value === option.value ? "text-neon-teal bg-black/5 dark:bg-white/5" : "text-slate-300"
                   )}
                 >
                   {option.label}
