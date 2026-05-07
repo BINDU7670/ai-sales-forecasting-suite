@@ -12,11 +12,13 @@ import {
 import dynamic from 'next/dynamic';
 import { NavItem } from '@/components/NavItem';
 import { CyberLoader } from '../components/ui/CyberLoader';
+import { SalesDistributionChart } from '@/components/SalesDistributionChart';
+import { ThemeToggle } from '@/components/ThemeToggle';
 
 const ForecastingChart = dynamic(() => import('@/components/ForecastingChart').then(mod => mod.ForecastingChart), { 
   ssr: false,
   loading: () => (
-    <div className="w-full h-[350px] flex items-center justify-center text-slate-500 bg-obsidian-light/20 rounded-xl border border-glass-border/50 animate-pulse">
+    <div className="w-full h-[350px] flex items-center justify-center text-slate-500 bg-black/5 dark:bg-white/5 rounded-xl border border-glass-border/50 animate-pulse">
       Loading chart...
     </div>
   )
@@ -33,6 +35,7 @@ export default function Dashboard() {
   const [userProfile, setUserProfile] = useState({ full_name: 'User', email: '' });
   const [kpis, setKpis] = useState({ total_revenue: "$0.00", average_order_value: "$0.00", peak_sales_day: "N/A", growth_rate: "+0.0%" });
   const [chartData, setChartData] = useState([]);
+  const [categoryDistribution, setCategoryDistribution] = useState([]);
   const [categories, setCategories] = useState<string[]>([]);
   const [selectedCategory, setSelectedCategory] = useState<string>('All Categories');
   const [dateRange, setDateRange] = useState('Lifetime Data');
@@ -88,6 +91,7 @@ export default function Dashboard() {
       const kpiData = await kpiRes.json();
       setKpis(kpiData.kpis);
       setChartData(kpiData.chart_data);
+      if (kpiData.category_distribution) setCategoryDistribution(kpiData.category_distribution);
       if (kpiData.categories) setCategories(kpiData.categories);
       if (kpiData.date_range) setDateRange(kpiData.date_range);
 
@@ -200,7 +204,7 @@ export default function Dashboard() {
       <aside className={`fixed md:relative z-50 md:z-20 flex flex-col h-screen transition-[width,transform] duration-300 ease-in-out border-r border-glass-border bg-obsidian-light shrink-0 ${isDesktopSidebarOpen ? 'w-64' : 'w-64 md:w-20'} ${isMobileSidebarOpen ? 'translate-x-0' : '-translate-x-full'} md:translate-x-0`}>
         <div className="h-16 flex items-center justify-between px-4 border-b border-glass-border">
           <span className={`font-bold text-lg tracking-tight text-white transition-all duration-300 whitespace-nowrap overflow-hidden ${!isDesktopSidebarOpen ? 'md:max-w-0 md:opacity-0' : 'md:max-w-[150px] md:opacity-100'}`}>Forecast</span>
-          <button onClick={() => setDesktopSidebarOpen(!isDesktopSidebarOpen)} className={`hidden md:block p-2 rounded-lg hover:bg-white/5 transition-colors text-slate-400 hover:text-white cursor-pointer ${!isDesktopSidebarOpen ? 'mx-auto' : ''}`}>
+          <button onClick={() => setDesktopSidebarOpen(!isDesktopSidebarOpen)} className={`hidden md:block p-2 rounded-lg hover:bg-black/5 dark:hover:bg-white/5 transition-colors text-slate-400 hover:text-white cursor-pointer ${!isDesktopSidebarOpen ? 'mx-auto' : ''}`}>
             {isDesktopSidebarOpen ? <ChevronLeft size={20} /> : <Menu size={20} />}
           </button>
         </div>
@@ -232,11 +236,12 @@ export default function Dashboard() {
         
         <header className="h-16 flex items-center justify-between px-4 sm:px-6 lg:px-8 border-b border-glass-border glass-panel z-30 shrink-0">
           <div className="flex items-center gap-3">
-            <button onClick={() => setMobileSidebarOpen(true)} className="md:hidden p-2 -ml-2 rounded-lg hover:bg-white/5 transition-colors text-slate-400 hover:text-white cursor-pointer"><Menu size={20} /></button>
+            <button onClick={() => setMobileSidebarOpen(true)} className="md:hidden p-2 -ml-2 rounded-lg hover:bg-black/5 dark:hover:bg-white/5 transition-colors text-slate-400 hover:text-white cursor-pointer"><Menu size={20} /></button>
             <h1 className="text-xl font-semibold text-white truncate max-w-[150px] sm:max-w-none">Forecast AI Dashboard</h1>
           </div>
 
           <div className="flex items-center gap-2 sm:gap-4">
+            <ThemeToggle />
             <div className="hidden lg:flex items-center gap-2 glass-panel px-3 py-1.5 rounded-lg text-sm text-slate-300">
               <Calendar size={16} className="text-electric-indigo" />
               <span>{dateRange}</span>
@@ -245,7 +250,7 @@ export default function Dashboard() {
             <div className="relative">
               <button 
                 onClick={() => setIsCategoryMenuOpen(!isCategoryMenuOpen)}
-                className="flex items-center gap-2 glass-panel px-3 py-1.5 rounded-lg text-sm text-slate-300 hover:bg-white/5 transition-colors cursor-pointer border border-white/10"
+                className="flex items-center gap-2 glass-panel px-3 py-1.5 rounded-lg text-sm text-slate-300 hover:bg-black/5 dark:hover:bg-white/5 transition-colors cursor-pointer border border-white/10"
               >
                 <Filter size={16} className="text-cyber-purple" />
                 <span className="hidden sm:inline">{selectedCategory}</span>
@@ -266,11 +271,6 @@ export default function Dashboard() {
                 </div>
               )}
             </div>
-
-            <button className="flex items-center gap-2 bg-white/5 hover:bg-white/10 border border-glass-border px-3 sm:px-4 py-1.5 rounded-lg text-sm font-medium transition-colors cursor-pointer">
-              <Download size={16} />
-              <span className="hidden sm:inline">Export</span>
-            </button>
           </div>
         </header>
 
@@ -324,14 +324,23 @@ export default function Dashboard() {
                 />
               </div>
 
-              <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                <div className="lg:col-span-2 glass-panel rounded-2xl p-4 sm:p-6 flex flex-col min-h-[450px]">
+              <div className="grid grid-cols-1 lg:grid-cols-10 gap-6">
+                <div className="lg:col-span-7 glass-panel rounded-2xl p-4 sm:p-6 flex flex-col min-h-[450px]">
                   <h2 className="text-lg font-semibold text-white mb-6">Strategic Forecast Projection</h2>
                   <div className="flex-1"><ForecastingChart data={chartData} noDataset={noDataset} /></div>
                 </div>
 
-                <div className="lg:col-span-1 flex flex-col gap-4">
-                  <div className="glass-panel-glow rounded-2xl p-5 sm:p-6 relative overflow-hidden shrink-0 border border-electric-indigo/20">
+                <div className="lg:col-span-3 glass-panel rounded-2xl p-4 sm:p-6 flex flex-col min-h-[350px]">
+                  <h2 className="text-lg font-semibold text-white mb-6">Sales Distribution</h2>
+                  <div className="flex-1 min-h-[250px] lg:min-h-[350px]">
+                    <SalesDistributionChart data={categoryDistribution} />
+                  </div>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                <div className="lg:col-span-2 glass-panel-glow rounded-2xl p-5 sm:p-6 relative overflow-hidden flex flex-col justify-between shrink-0 border border-electric-indigo/20">
+                  <div>
                     <div className="absolute top-0 left-0 w-full h-1 bg-gradient-ai" />
                     <div className="flex items-center gap-2 mb-4">
                       <Sparkles className="w-5 h-5 text-cyber-purple" />
@@ -353,30 +362,18 @@ export default function Dashboard() {
                       </>
                     )}
                   </div>
+                </div>
 
-                  <div className="space-y-3 shrink-0">
-                    {noDataset ? (
-                      <p className="text-xs text-slate-600 text-center py-4 italic">Insights will appear after uploading a dataset.</p>
-                    ) : aiAnalysis.insights.length > 0 ? (
-                      aiAnalysis.insights.map((card: any, i: number) => (
-                        <InsightCard key={i} title={card.title} impact={card.impact} type={card.type} />
-                      ))
-                    ) : (
-                      <p className="text-xs text-slate-500 text-center py-4">Generating tactical cards...</p>
-                    )}
-                  </div>
-
-                  <div className="mt-auto pt-4 border-t border-glass-border">
-                    <button 
-                      onClick={() => setIsChatOpen(true)}
-                      className="w-full relative group flex items-center justify-between bg-obsidian-light/80 border border-glass-border hover:border-cyber-purple/50 rounded-xl py-3 px-4 transition-all cursor-pointer"
-                    >
-                      <span className="text-sm text-slate-400 group-hover:text-slate-200 transition-colors">Probe AI for segment deep-dives...</span>
-                      <div className="p-1.5 bg-electric-indigo/20 text-electric-indigo rounded-lg group-hover:bg-electric-indigo group-hover:text-white transition-colors">
-                        <MessageCircle size={14} />
-                      </div>
-                    </button>
-                  </div>
+                <div className="lg:col-span-1 space-y-3 flex flex-col justify-center">
+                  {noDataset ? (
+                    <p className="text-xs text-slate-600 text-center py-4 italic">Insights will appear after uploading a dataset.</p>
+                  ) : aiAnalysis.insights.length > 0 ? (
+                    aiAnalysis.insights.map((card: any, i: number) => (
+                      <InsightCard key={i} title={card.title} impact={card.impact} type={card.type} />
+                    ))
+                  ) : (
+                    <p className="text-xs text-slate-500 text-center py-4">Generating tactical cards...</p>
+                  )}
                 </div>
               </div>
             </div>
@@ -404,7 +401,7 @@ export default function Dashboard() {
                   <p className="text-[10px] text-neon-teal font-medium tracking-wide">● LIVE</p>
                 </div>
               </div>
-              <button onClick={() => setIsChatOpen(false)} className="p-1.5 text-slate-400 hover:text-white hover:bg-white/10 rounded-lg transition-colors cursor-pointer">
+              <button onClick={() => setIsChatOpen(false)} className="p-1.5 text-slate-400 hover:text-white hover:bg-black/10 dark:hover:bg-white/10 rounded-lg transition-colors cursor-pointer">
                 <X size={18} />
               </button>
             </div>
@@ -419,7 +416,7 @@ export default function Dashboard() {
                   <div key={i} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
                     <div className={`max-w-[85%] rounded-2xl px-4 py-2.5 text-sm ${
                       msg.role === 'user' 
-                        ? 'bg-white/10 border border-white/20 text-white rounded-tr-sm' 
+                        ? 'bg-black/10 dark:bg-white/10 border border-black/20 dark:border-white/20 text-white rounded-tr-sm' 
                         : 'glass-panel-glow border-electric-indigo/20 text-slate-200 rounded-tl-sm'
                     }`}>
                       <div className="leading-relaxed">
@@ -457,7 +454,7 @@ export default function Dashboard() {
               <button 
                 type="submit"
                 disabled={!chatInput.trim() || isChatProcessing}
-                className={`p-2.5 rounded-lg transition-colors shrink-0 cursor-pointer ${!chatInput.trim() || isChatProcessing ? 'bg-white/5 text-slate-500 cursor-not-allowed' : 'bg-electric-indigo hover:bg-electric-indigo/80 text-white'}`}
+                className={`p-2.5 rounded-lg transition-colors shrink-0 cursor-pointer ${!chatInput.trim() || isChatProcessing ? 'bg-black/5 dark:bg-white/5 text-slate-500 cursor-not-allowed' : 'bg-electric-indigo hover:bg-electric-indigo/80 text-pure-white dark:text-white'}`}
               >
                 <Send size={16} />
               </button>
@@ -503,7 +500,7 @@ const InsightCard = memo(function InsightCard({ title, impact, type }: { title: 
   };
 
   return (
-    <div className={`glass-panel rounded-xl p-4 border-l-2 ${type === 'warning' ? 'border-l-rose-500' : type === 'success' ? 'border-l-neon-teal' : 'border-l-electric-indigo'} flex items-start justify-between gap-4 border border-white/5 shadow-lg`}>
+    <div className={`glass-panel rounded-xl p-4 border-l-2 ${type === 'warning' ? 'border-l-rose-500' : type === 'success' ? 'border-l-neon-teal' : 'border-l-electric-indigo'} flex items-start justify-between gap-4 border border-black/5 dark:border-white/5 shadow-lg`}>
       <div className="flex items-start gap-3">
         {type === 'warning' ? <AlertTriangle size={16} className="text-rose-500 mt-0.5 shrink-0" /> : <Sparkles size={16} className={type === 'success' ? 'text-neon-teal mt-0.5 shrink-0' : 'text-electric-indigo mt-0.5 shrink-0'} />}
         <p className="text-xs text-slate-300 font-medium">{title}</p>

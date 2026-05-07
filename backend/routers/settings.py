@@ -116,7 +116,7 @@ def update_preferences(request: PreferencesData, db: Session = Depends(get_db), 
 
 @router.post("/clear-cache")
 def clear_cache(current_user: models.User = Depends(get_current_user)):
-    # Placeholder for stateless cache clearing
+    
     return {"message": "AI context cache cleared successfully!"}
 
 @router.delete("/account")

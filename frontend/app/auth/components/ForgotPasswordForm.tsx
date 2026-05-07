@@ -44,7 +44,7 @@ export function ForgotPasswordForm({ onBackToLogin }: { onBackToLogin: () => voi
     if (!/^\d*$/.test(value)) return;
 
     const newOtp = [...otp];
-    // Take only the last character if they pasted or typed multiple
+    
     newOtp[index] = value.slice(-1);
     setOtp(newOtp);
 
@@ -137,7 +137,6 @@ export function ForgotPasswordForm({ onBackToLogin }: { onBackToLogin: () => voi
     }
   };
 
-  // Auto-focus first OTP input when step changes to 'otp'
   useEffect(() => {
     if (step === 'otp') {
       otpRefs.current[0]?.focus();
@@ -179,7 +178,7 @@ export function ForgotPasswordForm({ onBackToLogin }: { onBackToLogin: () => voi
               <button
                 type="submit"
                 disabled={isLoading || !email}
-                className="w-full flex justify-center items-center py-3.5 px-4 border border-transparent rounded-xl shadow-sm text-sm font-medium text-white bg-gradient-ai hover:opacity-90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-cyber-purple focus:ring-offset-obsidian transition-all duration-300 disabled:opacity-70 disabled:cursor-not-allowed cursor-pointer"
+                className="w-full flex justify-center items-center py-3.5 px-4 border border-transparent rounded-xl shadow-sm text-sm font-medium text-pure-white bg-gradient-ai hover:opacity-90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-cyber-purple focus:ring-offset-obsidian transition-all duration-300 disabled:opacity-70 disabled:cursor-not-allowed cursor-pointer"
               >
                 Send Reset Code
                 <ArrowRight className="ml-2 w-4 h-4" />
@@ -188,7 +187,7 @@ export function ForgotPasswordForm({ onBackToLogin }: { onBackToLogin: () => voi
                 type="button"
                 onClick={onBackToLogin}
                 disabled={isLoading}
-                className="w-full flex justify-center items-center py-3.5 px-4 border border-glass-border rounded-xl shadow-sm text-sm font-medium text-slate-300 hover:text-white hover:bg-obsidian-light/50 transition-all duration-300 disabled:opacity-70 disabled:cursor-not-allowed cursor-pointer"
+                className="w-full flex justify-center items-center py-3.5 px-4 border border-slate-300 dark:border-glass-border rounded-xl shadow-sm text-sm font-medium text-slate-700 dark:text-slate-300 hover:text-black dark:hover:text-white hover:bg-slate-100 dark:hover:bg-obsidian-light/50 transition-all duration-300 disabled:opacity-70 disabled:cursor-not-allowed cursor-pointer"
               >
                 <ArrowLeft className="mr-2 w-4 h-4" />
                 Back to Login
@@ -239,7 +238,7 @@ export function ForgotPasswordForm({ onBackToLogin }: { onBackToLogin: () => voi
                 type="button"
                 onClick={() => setStep('email')}
                 disabled={isLoading}
-                className="flex-1 flex justify-center items-center py-3.5 px-4 border border-glass-border rounded-xl shadow-sm text-sm font-medium text-slate-300 hover:text-white hover:bg-obsidian-light/50 transition-all duration-300 disabled:opacity-70 disabled:cursor-not-allowed cursor-pointer"
+                className="flex-1 flex justify-center items-center py-3.5 px-4 border border-slate-300 dark:border-glass-border rounded-xl shadow-sm text-sm font-medium text-slate-700 dark:text-slate-300 hover:text-black dark:hover:text-white hover:bg-slate-100 dark:hover:bg-obsidian-light/50 transition-all duration-300 disabled:opacity-70 disabled:cursor-not-allowed cursor-pointer"
               >
                 <ArrowLeft className="mr-2 w-4 h-4" />
                 Back
@@ -247,7 +246,7 @@ export function ForgotPasswordForm({ onBackToLogin }: { onBackToLogin: () => voi
               <button
                 type="submit"
                 disabled={isLoading || otp.join('').length !== 6}
-                className="flex-[2] flex justify-center items-center py-3.5 px-4 border border-transparent rounded-xl shadow-sm text-sm font-medium text-white bg-gradient-ai hover:opacity-90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-cyber-purple focus:ring-offset-obsidian transition-all duration-300 disabled:opacity-70 disabled:cursor-not-allowed cursor-pointer"
+                className="flex-[2] flex justify-center items-center py-3.5 px-4 border border-transparent rounded-xl shadow-sm text-sm font-medium text-pure-white bg-gradient-ai hover:opacity-90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-cyber-purple focus:ring-offset-obsidian transition-all duration-300 disabled:opacity-70 disabled:cursor-not-allowed cursor-pointer"
               >
                 Verify Code
               </button>
@@ -288,7 +287,7 @@ export function ForgotPasswordForm({ onBackToLogin }: { onBackToLogin: () => voi
             <button
               type="submit"
               disabled={isLoading || !newPassword || !confirmPassword}
-              className="w-full flex justify-center items-center py-3.5 px-4 border border-transparent rounded-xl shadow-sm text-sm font-medium text-white bg-gradient-ai hover:opacity-90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-cyber-purple focus:ring-offset-obsidian transition-all duration-300 mt-8 disabled:opacity-70 disabled:cursor-not-allowed cursor-pointer"
+              className="w-full flex justify-center items-center py-3.5 px-4 border border-transparent rounded-xl shadow-sm text-sm font-medium text-pure-white bg-gradient-ai hover:opacity-90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-cyber-purple focus:ring-offset-obsidian transition-all duration-300 mt-8 disabled:opacity-70 disabled:cursor-not-allowed cursor-pointer"
             >
               Reset Password
             </button>

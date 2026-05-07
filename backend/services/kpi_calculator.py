@@ -40,7 +40,7 @@ def calculate_dashboard_metrics(file_path: str, category_filter: str = None, dat
             df[quantity_col] = pd.to_numeric(df[quantity_col], errors='coerce').fillna(0)
 
         if date_col:
-            df[date_col] = pd.to_datetime(df[date_col], errors='coerce', dayfirst=True)
+            df[date_col] = pd.to_datetime(df[date_col], errors='coerce', format='mixed')
 
         categories = []
         if category_col:
@@ -80,6 +80,8 @@ def calculate_dashboard_metrics(file_path: str, category_filter: str = None, dat
         date_range_str = "N/A"
         valid_dates = df
 
+        anomaly_data = []
+
         if date_col:
             valid_dates = df.dropna(subset=[date_col]).copy()
             if not valid_dates.empty:
@@ -97,6 +99,29 @@ def calculate_dashboard_metrics(file_path: str, category_filter: str = None, dat
                     last_half = valid_dates.iloc[midpoint:][amount_col].sum()
                     if first_half > 0:
                         growth = ((last_half - first_half) / first_half) * 100
+
+                
+                daily_sales = valid_dates.groupby(valid_dates[date_col].dt.date)[amount_col].sum().reset_index()
+                daily_sales = daily_sales.sort_values(by=date_col)
+                
+                
+                recent_daily = daily_sales.tail(60).copy()
+                mean_sales = recent_daily[amount_col].mean()
+                std_sales = recent_daily[amount_col].std()
+                
+                for idx, row in recent_daily.iterrows():
+                    val = row[amount_col]
+                    is_anomaly = False
+                    if std_sales > 0:
+                        z_score = (val - mean_sales) / std_sales
+                        if abs(z_score) > 2.0:  
+                            is_anomaly = True
+                    
+                    anomaly_data.append({
+                        "date": row[date_col].strftime('%b %d'),
+                        "sales": round(val, 2),
+                        "anomaly": round(val, 2) if is_anomaly else None
+                    })
 
                 valid_dates['SortMonth'] = valid_dates[date_col].dt.to_period('M')
                 monthly_sales = valid_dates.groupby('SortMonth')[amount_col].sum().reset_index()
@@ -132,6 +157,22 @@ def calculate_dashboard_metrics(file_path: str, category_filter: str = None, dat
                             "bounds": [round(max(0, next_val - variance), 2), round(next_val + variance, 2)]
                         })
                         last_val = next_val
+
+        category_distribution = []
+        if category_col:
+            cat_group = df.groupby(category_col)[amount_col].sum().reset_index()
+            cat_group = cat_group.sort_values(amount_col, ascending=False)
+            colors = ["var(--color-electric-indigo)", "var(--color-cyber-purple)", "var(--color-neon-teal)", "var(--color-emerald-400)", "var(--color-rose-400)"]
+            for idx, (_, row) in enumerate(cat_group.iterrows()):
+                val = float(row[amount_col])
+                if val > 0:
+                    pct = round((val / total_revenue) * 100, 1)
+                    category_distribution.append({
+                        "name": str(row[category_col]),
+                        "value": pct,
+                        "revenue": val,
+                        "color": colors[idx % len(colors)]
+                    })
 
         top_products = []
         group_col = product_col if product_col else category_col
@@ -170,6 +211,8 @@ def calculate_dashboard_metrics(file_path: str, category_filter: str = None, dat
                 "growth_rate": f"{growth:+.1f}%"
             },
             "chart_data": chart_data,
+            "anomaly_data": anomaly_data,
+            "category_distribution": category_distribution,
             "categories": categories,
             "top_products": top_products,
             "date_range": date_range_str

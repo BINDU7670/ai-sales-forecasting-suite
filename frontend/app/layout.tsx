@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import { Inter, Space_Grotesk } from 'next/font/google';
+import { ThemeProvider } from 'next-themes';
 import './globals.css';
 import { GlobalChatWidget } from '@/components/GlobalChatWidget';
 
@@ -20,12 +21,14 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" className={`${inter.variable} ${spaceGrotesk.variable}`}>
+    <html lang="en" suppressHydrationWarning className={`${inter.variable} ${spaceGrotesk.variable}`}>
       <head>
       </head>
       <body className="antialiased min-h-screen flex flex-col" suppressHydrationWarning>
-        {children}
-        <GlobalChatWidget />
+        <ThemeProvider attribute="class" defaultTheme="light" enableSystem={false}>
+          {children}
+          <GlobalChatWidget />
+        </ThemeProvider>
       </body>
     </html>
   );
